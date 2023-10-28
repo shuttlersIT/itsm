@@ -98,3 +98,14 @@ type Role struct {
 	RoleID   int    `json:"role_id"`
 	RoleName string `json:"role_name"`
 }
+
+type Categories struct {
+	CategoryID   int    `json:"category_id"`
+	CategoryName string `json:"category_name"`
+}
+
+type SubCategories struct {
+	SubCategoryID   int    `json:"sub_category_id"`
+	SubCategoryName string `json:"sub_category_name"`
+	CategoryID      int    `json:"category_id"`
+}

@@ -1,0 +1,815 @@
+{
+  "name": "Segmentation",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://bi.shuttlers.ng/api/dataset/json",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-Metabase-Session",
+              "value": "={{ $json[\"sessionId\"] }}"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/x-www-form-urlencoded"
+            }
+          ]
+        },
+        "sendBody": true,
+        "contentType": "form-urlencoded",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "=query",
+              "value": "={\"database\":2,\"type\":\"native\",\"native\": {\"query\":\"{{ $json['query '] }}\"}}"
+            },
+            {
+              "name": "="
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3b2797f8-e5c7-449d-93c5-8a9f034f3e65",
+      "name": "Query",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        -940,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "f20a7fd6-9b4e-42fb-ad54-559d54f73950",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        -1340,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "=query ",
+              "value": "=\nselect \\n\n    user_id \\n\n    ,concat(lname,' ',fname) as customer_name \\n\n    ,email \\n\n    ,phone \\n\n    ,count(user_route_schedules.id) as total_bookings \\n\n    ,case \\n\n        when corporate_id is null then 'B2C' else 'B2B' \\n\n        end as corporate_type \\n\n    ,case \\n\n        when count(user_route_schedules.id) between 0 and 7 then 'Bronze' \\n\n        when count(user_route_schedules.id) between 8 and 11 then 'Silver' \\n\n        when count(user_route_schedules.id) between 12 and 15 then 'Gold' \\n\n        when count(user_route_schedules.id) > 16 then 'Platinum' \\n\n        else 'Carbon' end as customer_segment \\n\\n\nfrom user_route_schedules \\n\ninner join users u on u.id = user_id \\n\\n\nwhere \\n\n    (trip_date >= date(date_add(now(6), INTERVAL -30 day)) \\n\n    AND trip_date < date(now(6))) \\n\n    AND status = 'Completed' \\n\n    AND email = '{{ $json[\"email\"] }}' \\n\\n\ngroup by \\n\n    user_id \\n\n    ,concat(lname,' ',fname) \\n\n    ,email \\n\n    ,phone \\n\n    ,case \\n\n        when corporate_id is null then 'B2C' else 'B2B' \\n\n        end  \\n\\n\norder by \\n\n    count(user_route_schedules.id) desc"
+            },
+            {
+              "name": "sessionId",
+              "value": "={{ $json[\"X-Metabase-Session\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "2def9a5b-d0c5-4df7-a937-e3b5b3119e58",
+      "name": "Set Query",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1140,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "values": {
+          "string": [
+            {
+              "name": "email",
+              "value": "={{ $json[\"body\"][0][\"payload\"][\"contact\"][\"email\"] }}"
+            },
+            {
+              "name": "nowTime",
+              "value": "={{ $json[\"currentDate\"] }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $json.body[0].payload.contact.id }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "f597c885-2537-4750-92fc-ef3acc374093",
+      "name": "Set User Email",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        -1560,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "value": "={{ $json[\"date_today\"] }}",
+        "dataPropertyName": "currentDate",
+        "toFormat": "YYYY-MM-DD",
+        "options": {}
+      },
+      "id": "f98e0496-e218-408c-9d83-5e7b40a3fe0a",
+      "name": "Date & Time",
+      "type": "n8n-nodes-base.dateTime",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "var date = new Date().toISOString();\nvar day = new Date().getDay();\nconst weekday = [\"Sunday\", \"Monday\", \"Tuesday\", \"Wednesday\", \"Thursday\", \"Friday\", \"Saturday\"];\n\nitems[0].json.date_today = date;\nitems[0].json.day_today = weekday[day];\n\nreturn items;"
+      },
+      "id": "c7b9e018-8502-45a2-9777-b3c77ffc18a2",
+      "name": "Code",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 1,
+      "position": [
+        -1960,
+        360
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "Customer Segment",
+              "value": "={{ $json[\"data\"][0][\"customer_segment\"] }}"
+            },
+            {
+              "name": "Product",
+              "value": "={{ $json[\"data\"][0][\"corporate_type\"] }}"
+            },
+            {
+              "name": "email",
+              "value": "={{ $json[\"email\"] }}"
+            },
+            {
+              "name": "contactId",
+              "value": "={{ $json.contactId }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "96b7ddd2-a4c8-41db-808c-6bebe0fb78ec",
+      "name": "Set Trips",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        500
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "40b449d4-55de-4e73-ab01-b9564a95f2c4",
+      "name": "Merge1",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1060,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "db03fc3c-60ae-4586-ad98-8b92ae0811af",
+      "name": "Merge2",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "f6fdc262-69f5-4311-91a2-9278d78c9789",
+      "name": "Merge3",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "PATCH",
+        "url": "=https://desk.zoho.com/api/v1/contacts/{{ $json.contactId }}",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {}
+          ]
+        },
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "orgId",
+              "value": "777546923"
+            },
+            {
+              "name": "Authorization",
+              "value": "=Zoho-oauthtoken  {{ $json.accessToken }}"
+            },
+            {
+              "name": "=Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"email\" : \"{{ $json[\"email\"] }}\",\n  \"cf\" : {\n\t\t\"cf_customer_segment\" : \"{{ $json[\"Customer Segment\"] }}\",\n\t\t\"cf_product\" : \"{{ $json[\"Product\"] }}\"\n  \t    }\n}",
+        "options": {
+          "response": {
+            "response": {
+              "fullResponse": true,
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "1854e891-e1f5-49c9-90ee-3c7fc945b658",
+      "name": "Update Contact",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 3,
+      "position": [
+        2780,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "userId",
+              "value": "={{ $json[\"body\"][\"data\"][0][\"id\"] }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "eb6e897c-a7b1-43b4-84b8-1774aeeb9ba3",
+      "name": "Set User Id",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        1920,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "keepOnlySet": true,
+        "values": {
+          "string": [
+            {
+              "name": "accessToken",
+              "value": "={{ $json.body.access_token }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3e6a8d21-0d8a-4002-87dd-3394ce12c271",
+      "name": "Set Access Token",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 1,
+      "position": [
+        2160,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "3d793273-2abd-4670-b3b9-2f2395d02fcb",
+      "name": "Merge4",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [
+        2580,
+        340
+      ]
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "281b7281-adb5-417b-8f57-3cc4a12c68cc",
+      "name": "Split In Batches",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 1,
+      "position": [
+        -140,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "aggregateItems",
+        "aggregate": "aggregateAllItemData"
+      },
+      "id": "e84d888c-ead5-441a-b17e-462f91cf256a",
+      "name": "Item Lists",
+      "type": "n8n-nodes-base.itemLists",
+      "typeVersion": 1,
+      "position": [
+        -340,
+        200
+      ]
+    },
+    {
+      "parameters": {},
+      "id": "7a619cf9-62a0-4c4b-bb6c-138fd1c81386",
+      "name": "Execute Workflow Trigger",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1,
+      "position": [
+        -2240,
+        260
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "1"
+      },
+      "id": "b4c201cb-e300-40b7-8330-cb56169ac9c7",
+      "name": "Execute Workflow",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        -1760,
+        180
+      ]
+    },
+    {
+      "parameters": {
+        "workflowId": "2"
+      },
+      "id": "071495af-1fbc-4afa-9628-3398bb552599",
+      "name": "Execute Workflow1",
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1,
+      "position": [
+        1280,
+        160
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "string": [
+            {
+              "value1": "={{ $json.status }}",
+              "operation": "notEqual",
+              "value2": "=failed"
+            }
+          ]
+        }
+      },
+      "id": "82c3a330-8c1b-4903-9109-97575b206268",
+      "name": "IF",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 1,
+      "position": [
+        -720,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "errorMessage": "User Has no Trips"
+      },
+      "id": "63eddbd5-f800-47fa-927a-e51eb828bd94",
+      "name": "Stop and Error",
+      "type": "n8n-nodes-base.stopAndError",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        660
+      ]
+    }
+  ],
+  "pinData": {
+    "Execute Workflow Trigger": [
+      {
+        "json": {
+          "headers": {
+            "host": "dragonfly.shuttlers.africa",
+            "content-length": "2389",
+            "req-mi-chain": "-1407259486:8080",
+            "user-agent": "DeskWebhook",
+            "content-type": "application/json",
+            "accept": "text/html, image/gif, image/jpeg, *; q=.2, */*; q=.2"
+          },
+          "params": {},
+          "query": {},
+          "body": [
+            {
+              "payload": {
+                "modifiedTime": "2023-04-26T13:18:03.000Z",
+                "subCategory": "Booking Cancellation",
+                "statusType": "Open",
+                "subject": "User Cancelled Booking",
+                "dueDate": "2023-04-26T13:49:00.000Z",
+                "departmentId": "723600000000345139",
+                "channel": "Phone",
+                "onholdTime": null,
+                "language": null,
+                "source": {
+                  "appName": null,
+                  "extParentId": null,
+                  "extId": null,
+                  "permalink": null,
+                  "type": "SYSTEM",
+                  "appPhotoURL": null
+                },
+                "resolution": null,
+                "sharedDepartments": [],
+                "closedTime": null,
+                "approvalCount": "0",
+                "isOverDue": false,
+                "isTrashed": false,
+                "contact": {
+                  "firstName": "Seyi",
+                  "lastName": "Ajayi",
+                  "phone": null,
+                  "mobile": "08161178125",
+                  "id": "723600000027322967",
+                  "isSpam": false,
+                  "type": null,
+                  "email": "oluwaseyia@heliumhealth.ng",
+                  "account": null
+                },
+                "createdTime": "2023-04-26T13:18:03.000Z",
+                "id": "723600000029975642",
+                "isResponseOverdue": false,
+                "customerResponseTime": "2023-04-26T13:18:03.000Z",
+                "firstThread": null,
+                "productId": null,
+                "contactId": "723600000027322967",
+                "threadCount": "1",
+                "secondaryContacts": [],
+                "priority": "Low",
+                "classification": null,
+                "commentCount": "0",
+                "taskCount": "0",
+                "accountId": null,
+                "phone": "08161178125",
+                "webUrl": "https://desk.zoho.com/support/shuttlersmobility/ShowHomePage.do#Cases/dv/723600000029975642",
+                "assignee": {
+                  "photoURL": "https://desk.zoho.com/api/v1/agents/723600000000394001/photo?orgId=777546923",
+                  "firstName": "Seyi",
+                  "lastName": "Yusuf",
+                  "id": "723600000000394001",
+                  "email": "oluwaseyi.yusuf@shuttlers.ng"
+                },
+                "isSpam": false,
+                "status": "Open",
+                "entitySkills": [],
+                "ticketNumber": "44612",
+                "sentiment": null,
+                "customFields": {
+                  "Organization": null,
+                  "zendesk-id": null,
+                  "Unavailable Route": null,
+                  "Query Type": null,
+                  "Qualification Status": null,
+                  "Route Code": "IYJ95."
+                },
+                "isArchived": false,
+                "description": "No reason",
+                "timeEntryCount": "0",
+                "channelRelatedInfo": null,
+                "responseDueDate": null,
+                "isDeleted": false,
+                "modifiedBy": "723600000000394001",
+                "followerCount": "0",
+                "email": "oluwaseyia@heliumhealth.ng",
+                "layoutDetails": {
+                  "id": "723600000000365608",
+                  "layoutName": "Shuttlers Customer Experience"
+                },
+                "channelCode": null,
+                "cf": {
+                  "cf_query_type": null,
+                  "cf_organization": null,
+                  "cf_qualification_status": null,
+                  "cf_zendesk_id": null,
+                  "cf_route_code": "IYJ95.",
+                  "cf_unavailable_root": null
+                },
+                "layoutId": "723600000000365608",
+                "assigneeId": "723600000000394001",
+                "createdBy": "723600000000394001",
+                "teamId": null,
+                "tagCount": "0",
+                "attachmentCount": "0",
+                "isEscalated": false,
+                "category": "User Cancelled Booking",
+                "descAttachments": []
+              },
+              "eventTime": "1682515083980",
+              "eventType": "Ticket_Add",
+              "orgId": "777546923"
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Set Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Query": {
+      "main": [
+        [
+          {
+            "node": "Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set User Email": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Date & Time": {
+      "main": [
+        [
+          {
+            "node": "Set User Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Date & Time",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Query": {
+      "main": [
+        [
+          {
+            "node": "IF",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Trips": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Set Trips",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Workflow1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Set User Id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge3": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Set User Id": {
+      "main": [
+        [
+          {
+            "node": "Merge3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Access Token": {
+      "main": [
+        [
+          {
+            "node": "Merge4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge4": {
+      "main": [
+        [
+          {
+            "node": "Update Contact",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split In Batches": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Item Lists": {
+      "main": [
+        [
+          {
+            "node": "Split In Batches",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow Trigger": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Execute Workflow",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Execute Workflow1": {
+      "main": [
+        [
+          {
+            "node": "Set Access Token",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IF": {
+      "main": [
+        [
+          {
+            "node": "Item Lists",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Stop and Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "timezone": "Africa/Lagos",
+    "saveDataSuccessExecution": "none",
+    "saveManualExecutions": false,
+    "callerPolicy": "workflowsFromSameOwner",
+    "executionTimeout": 90
+  },
+  "versionId": "b307c8fb-c02f-4a4e-9b70-235dcccf74fc",
+  "id": "5",
+  "meta": {
+    "instanceId": "9a8538d492c3c6911883b051c1e3037a5a7362e378e69ccb25e610ed8a8cfb38"
+  },
+  "tags": []
+}

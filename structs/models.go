@@ -28,20 +28,20 @@ type Ticket struct {
 	Category        string `json:"category"`
 	SubCategory     string `json:"sub_category"`
 	Priority        string `json:"priority"`
-	SLA             string `json:"sla"`
-	StaffID         string `json:"staff_id"`
-	AgentID         string `json:"agent_id"`
+	SLA             int    `json:"sla"`
+	StaffID         int    `json:"staff_id"`
+	AgentID         int    `json:"agent_id"`
 	CreatedAt       string `json:"created_at"`
 	DueAt           string `json:"due_at"`
 	AssetID         string `json:"asset_id"`
-	RelatedTicketID string `json:"related_ticket_id"`
+	RelatedTicketID int    `json:"related_ticket_id"`
 	Tag             string `json:"tag"`
 	Site            string `json:"site"`
-	AttachmentID    string `json:"attachment"`
+	AttachmentID    int    `json:"attachment"`
 }
 
 type Asset struct {
-	AssetID       int    `json:"asset_id"`
+	AssetID       string `json:"asset_id"`
 	AssetType     string `json:"asset_type"`
 	AssetName     string `json:"asset_name"`
 	Description   string `json:"description"`
@@ -56,7 +56,7 @@ type Asset struct {
 
 type Sla struct {
 	SlaID          int    `json:"sla_id"`
-	SlaName        string `json:"sla_id"`
+	SlaName        string `json:"sla_name"`
 	PriorityID     int    `json:"priority_id"`
 	SatisfactionID int    `json:"satisfaction_id"`
 	PolicyID       int    `json:"policy_id"`

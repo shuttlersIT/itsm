@@ -5,12 +5,10 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="google-signin-client_id" content="946670882701-m2abv211cro66d5iho0rt2j8oth3670f.apps.googleusercontent.com">
+  <meta name="google-signin-client_id" content="946670882701-dcidm9tcfdpcikpbjj8rfsb6uci22o4s.apps.googleusercontent.com">
   <title>Welcome - Shuttlers Business Intelligence</title>
 
   <link rel="stylesheet" href="css/main.min.css">
-  <link rel="stylesheet" href="css/main.css">
-  <link rel="stylesheet" href="css/extra.css">
 
   <!-- Fonts -->
   <link rel="dns-prefetch" href="https://fonts.gstatic.com">
@@ -219,12 +217,12 @@
             <form method="get">
               <div class="field is-horizontal">
                 <div class="field-label is-normal">
-                  <a href="{{ .link }}"><button type='button' class="label">Sign in with google</button></a>
+                  <label class="label">Google</label>                
                 </div>
                 <div class="field-body">
                   <div class="field">
                     <p class="control is-expanded has-icons-left">
-                      <div class="g-signin2" data-onsuccess="onSignIn"></div>
+                      <a href="{{ .link }}"><button type='button' class="label g-signin2">Sign in with google</button></a>
                     </p>
                   </div>
                 </div>
@@ -331,13 +329,11 @@
 </div>
 
 <!-- Scripts below are for demo only -->
-<script type="text/javascript" src="https://github.com/shuttlersIT/intel/templates/js/main.min.js"></script>
+<script type="text/javascript" src="js/main.min.js"></script>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
-<script type="text/javascript" src="https://github.com/shuttlersIT/intel/templates/js/chart.sample.min.js"></script>
-<script type="text/javascript" src="https://github.com/shuttlersIT/intel/templates/js/main.js"></script>
-<script type="text/javascript" src="https://github.com/shuttlersIT/intel/templates/js/panels.js"></script>
+<script type="text/javascript" src="js/chart.sample.min.js"></script>
 
-<!-- Icons below are for demo only. Feel free to use any icon pack. Docs: https://bulma.io/documentation/elements/icon/ -->
+<!-- Icons -->
 <link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
 </body>
 </html>

@@ -1,40 +1,34 @@
-version: '3'
-services: 
-  intel: 
+version: '3.6'
+services:
+  intel:
     restart: always
     container_name: intel
     build:
       dockerfile: Dockerfile
       context: .
     ports:
-      - 9193:9193
+      - '127.0.0.1:9193:9193'
     environment:
-      - VIRTUAL_HOST=intelligence.shuttlers.africa
-      - LETSENCRYPT_HOST=intelligence.shuttlers.africa
-      - MONGO_URI=mongodb://mongodb:27017
-      - CONN_STR=mongodb://mongodb:27017
-    command: '/bin/bash -c "sleep 5; mongosh $$CONN_STR --eval \"show dbs;\""'
+      - VIRTUAL_HOST=intel.shuttlers.africa
+      - LETSENCRYPT_HOST=intel.shuttlers.africa
     volumes:
       - .:/src
       - .:/var/www
-    links:
-      - mongodb
     depends_on:
-      - mongodb
-  
-  mongodb:
-    container_name: mongodb
-    image: mongo:latest
-    ports:
-      - '27017:27017'
-    environment:
-      - VIRTUAL_HOST=mongodb://mongodb:27017
+      - redisDB
 
-  mongo-express:
-    image: mongo-express
+  redisDB:
+    image: redis:7.0.5-alpine
+    container_name: redisDB
     restart: always
+    volumes:
+      - /root/redis/intel/data:/data
     ports:
-      - '127.0.0.1:8089:8089'
+      - '127.0.0.1:6379:6379'
     environment:
-      ME_CONFIG_MONGODB_URL: mongodb://mongodb:27017/
-      VIRTUAL_HOST: mongo-express.shuttlers.africa
+     - REDIS_REPLICATION_MODE=master
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10    

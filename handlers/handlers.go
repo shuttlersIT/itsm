@@ -7,12 +7,10 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
-	"strings"
+	"fmt"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
-	"github.com/mcnijman/go-emailaddress"
-	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/structs"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -41,7 +39,7 @@ func init() {
 	conf = &oauth2.Config{
 		ClientID:     cid,
 		ClientSecret: cs,
-		RedirectURL:  "https://intelligence.shuttlers.africa/rest/oauth2-credential/callback",
+		RedirectURL:  "https://intel.shuttlers.africa/auth",
 		Scopes: []string{
 			"https://www.googleapis.com/auth/userinfo.email", // You have to select your own scope from here -> https://developers.google.com/identity/protocols/googlescopes#google_sign-in
 		},
@@ -49,33 +47,33 @@ func init() {
 	}
 }
 
-// IndexHandler handles the location /.
+/* IndexHandler handles the location /.
 func IndexHandler(c *gin.Context) {
 	state, err := RandToken(32)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while generating random data."})
-		return
+			c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while generating random data."})
+			return
 	}
 	session := sessions.Default(c)
 	session.Set("state", state)
 	err = session.Save()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while saving session."})
-		return
+			c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while saving session."})
+			return
 	}
 	link := getLoginURL(state)
 	c.HTML(http.StatusOK, "login.html", gin.H{"link": link})
-}
+}*/
 
 // IndexHandler handles the login
-func IndexHandler2(c *gin.Context) {
+func IndexHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "index.html", gin.H{})
 }
 
 // AuthHandler handles authentication of a user and initiates a session.
 func AuthHandler(c *gin.Context) {
 	//Declare shuttlers domain
-	shuttlersDomain := "shuttlers.ng"
+	//shuttlersDomain := "shuttlers.ng"
 
 	// Handle the exchange code to initiate a transport.
 	session := sessions.Default(c)
@@ -83,7 +81,7 @@ func AuthHandler(c *gin.Context) {
 	queryState := c.Request.URL.Query().Get("state")
 	if retrievedState != queryState {
 		log.Printf("Invalid session state: retrieved: %s; Param: %s", retrievedState, queryState)
-		c.HTML(http.StatusUnauthorized, "error.tmpl", gin.H{"message": "Invalid session state."})
+		c.HTML(http.StatusUnauthorized, "error.html", gin.H{"message": "Invalid session state."})
 		return
 	}
 	code := c.Request.URL.Query().Get("code")
@@ -110,21 +108,18 @@ func AuthHandler(c *gin.Context) {
 		return
 	}
 
-	usersEmail, err := emailaddress.Parse(u.Email)
+	session.Set("user-id", u.Email)
+	session.Set("user-name", u.Name)
+	err = session.Save()
+	
 	if err != nil {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like your email address is invalid, try again."})
+		log.Println(err)
+		c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Error while saving session. Please try again."})
+		return
 	}
+	//seen := false
 
-	if strings.Compare(usersEmail.Domain, shuttlersDomain) == 0 {
-		session.Set("user-id", u.Email)
-		session.Set("user-name", u.Name)
-		err = session.Save()
-		if err != nil {
-			log.Println(err)
-			c.HTML(http.StatusBadRequest, "index.html", gin.H{"message": "Error while saving session. Please try again."})
-			return
-		}
-		seen := false
+	/*
 		db := database.MongoDBConnection{}
 		if _, mongoErr := db.LoadUser(u.Email); mongoErr == nil {
 			seen = true
@@ -136,30 +131,75 @@ func AuthHandler(c *gin.Context) {
 				return
 			}
 		}
-		c.HTML(http.StatusOK, "home.html", gin.H{"email": u.Email, "Username": u.Name, "seen": seen})
-	} else {
-		c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like do not have a shuttlers email address, Please signin with your shuttlers email account."})
+	*/
+	userID := session.Get("user-id")
+	fmt.Println(userID)
+	fmt.Println(session)
+	//uName := session.Get("user-name")
+	c.HTML(http.StatusOK, "home.html", gin.H{"Username": userID})
+	//c.HTML(http.StatusOK, "home.html", gin.H{"name": uNam, "Username": userID, "seen": seen})
 
-	}
+	/*
+		usersEmail, err := emailaddress.Parse(u.Email)
+		if err != nil {
+				c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like your email address is invalid, try again."})
+		}
 
+		if strings.Compare(usersEmail.Domain, shuttlersDomain) == 0 {
+				session.Set("user-id", u.Email)
+				session.Set("user-name", u.Name)
+				err = session.Save()
+				if err != nil {
+						log.Println(err)
+						c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Error while saving session. Please try again."})
+						return
+				}
+				seen := false
+				db := database.MongoDBConnection{}
+				if _, mongoErr := db.LoadUser(u.Email); mongoErr == nil {
+						seen = true
+				} else {
+						err = db.SaveUser(&u)
+						if err != nil {
+								log.Println(err)
+								c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Something went wrong... it's not you, its us. Please try again."})
+								return
+						}
+				}
+				c.HTML(http.StatusOK, "portal.html", gin.H{"email": u.Email, "Username": u.Name, "seen": seen})
+		} else {
+				c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like do not have a shuttlers email address, Please signin with your shuttlers email account."})
+
+		}
+	*/
 }
 
 // LoginHandler handles the login procedure.
 func LoginHandler(c *gin.Context) {
 	state, err := RandToken(32)
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while generating random data."})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"message": "Error while generating random data."})
 		return
 	}
 	session := sessions.Default(c)
 	session.Set("state", state)
 	err = session.Save()
 	if err != nil {
-		c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while saving session."})
+		c.HTML(http.StatusInternalServerError, "error.html", gin.H{"message": "Error while saving session."})
 		return
 	}
 	link := getLoginURL(state)
-	c.HTML(http.StatusOK, "login.html", gin.H{"link": link})
+	c.HTML(http.StatusOK, "auth.html", gin.H{"link": link})
+}
+
+// Logout Handler
+func LogoutHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Clear()
+	session.Save()
+	c.JSON(http.StatusOK, gin.H{
+		"message": "User Sign out successfully",
+	})
 }
 
 // CxHandler is a rudementary handler for logged in users.

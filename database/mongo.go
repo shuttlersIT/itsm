@@ -39,7 +39,7 @@ func (mdb *MongoDBConnection) GetSession() *mgo.Session {
 	if mdb.session != nil {
 		return mdb.session.Copy()
 	}
-	session, err := mgo.Dial("mongodb://mongodb:27017")
+	session, err := mgo.Dial("mongodb://mongo:27017/portalsession")
 	if err != nil {
 		panic(err)
 	}

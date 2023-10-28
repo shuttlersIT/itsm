@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en" class="has-aside-left has-aside-mobile-transition has-navbar-fixed-top has-aside-expanded">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="google-signin-client_id" content="946670882701-dcidm9tcfdpcikpbjj8rfsb6uci22o4s.apps.googleusercontent.com">
+  <title>Welcome - Shuttlers Business Intelligence</title>
+
+  <link rel="stylesheet" href="css/main.min.css">
+
+  <!-- Fonts -->
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link href="https://fonts.googleapis.com/css?family=Nunito" rel="stylesheet" type="text/css">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+<body>
+<div id="app">
+  <nav id="navbar-main" class="navbar is-fixed-top">
+    <div class="navbar-brand">
+      <a class="navbar-item is-hidden-desktop jb-aside-mobile-toggle">
+        <span class="icon"><i class="mdi mdi-forwardburger mdi-24px"></i></span>
+      </a>
+      <div class="navbar-item has-control">
+        <div class="control"><input placeholder="Search everywhere..." class="input"></div>
+      </div>
+    </div>
+    <div class="navbar-brand is-right">
+      <a class="navbar-item is-hidden-desktop jb-navbar-menu-toggle" data-target="navbar-menu">
+        <span class="icon"><i class="mdi mdi-dots-vertical"></i></span>
+      </a>
+    </div>
+    <div class="navbar-menu fadeIn animated faster" id="navbar-menu">
+      <div class="navbar-end">
+        <div class="navbar-item has-dropdown has-dropdown-with-icons has-divider has-user-avatar is-hoverable">
+          <a class="navbar-link is-arrowless">
+            <div class="is-user-avatar mdi mdi-account">
+            </div>
+            <div class="is-user-name"><span>{{ .Username }}</span></div>
+            <span class="icon"><i class="mdi mdi-chevron-down"></i></span>
+          </a>
+          <div class="navbar-dropdown">
+            <a href="profile.html" class="navbar-item">
+              <span class="icon"><i class="mdi mdi-account"></i></span>
+              <span>My Profile</span>
+            </a>
+            <a class="navbar-item">
+              <span class="icon"><i class="mdi mdi-email"></i></span>
+              <span>Messages</span>
+            </a>
+            <a class="navbar-item">
+              <span class="icon"><i class="mdi mdi-settings"></i></span>
+              <span>Settings</span>
+            </a>
+            <hr class="navbar-divider">
+            <a class="navbar-item">
+              <span class="icon"><i class="mdi mdi-logout"></i></span>
+              <span>Log Out</span>
+            </a>
+          </div>
+        </div>
+        <a href="https://admin.shuttlers.africa" rel="noopener noreferrer" title="About" class="navbar-item has-divider is-desktop-icon-only">
+          <span class="icon">
+            <img src="./img/Logo.png" alt="admin.shuttlers.ng">
+          </span>
+          <span>Admin Dashboard</span>
+        </a>
+        <a title="Log out" class="navbar-item is-desktop-icon-only">
+          <span class="icon"><i class="mdi mdi-logout"></i></span>
+          <span>Log out</span>
+        </a>
+      </div>
+    </div>
+  </nav>
+  <aside class="aside is-placed-left is-expanded">
+    <div class="aside-tools">
+      <div class="aside-tools-label">
+        <span class="icon is-desktop-icon-only" style="vertical-align: middle;">
+          <img src="./img/Logo.png" alt="admin.shuttlers.ng">
+        </span>
+        <span><b>S h u t t l e r s</b></span>
+      </div>
+    </div>
+    <div class="menu is-menu-main">
+      <p class="menu-label">General</p>
+      <ul class="menu-list">
+        <li>
+          <a href="/index" class="has-icon">
+            <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+            <span class="menu-item-label">Business Performance</span>
+          </a>
+        </li>
+      </ul>
+      <p class="menu-label">Departments</p>
+      <ul class="menu-list">
+        <li>
+          <a class="has-icon has-dropdown-icon is-active router-link-active" id="inuse">
+            <span class="icon"><i class="mdi mdi-view-list"></i></span>
+            <span class="menu-item-label">Operations</span>
+            <div class="dropdown-icon">
+              <span class="icon"><i class="mdi mdi-plus"></i></span>
+            </div>
+          </a>
+          <ul>
+            <li>
+              <a href="/driverscorecard">
+                <span>Driver scorecard</span>
+              </a>
+            </li>
+            <li>
+              <a href="/marshaldashboard">
+                <span>Marshal Dashboard</span>
+              </a>
+            </li>
+            <li>
+              <a href="/seatoccupancy">
+                <span>Seat Occupancy</span>
+              </a>
+            </li>
+            <li>
+              <a href="/feedbacktracker">
+                <span>Feedback Tracker</span>
+              </a>
+            </li>
+            <li>
+              <a href="/shuttlersqa">
+                <span>Shuttlers QA</span>
+              </a>
+            </li>
+          </ul>
+        </li>
+        <li>
+          <a class="has-icon" href="/marketing">
+            <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+            <span class="menu-item-label">Marketing</span>
+          </a>
+        </li>
+        <li>
+          <a class="has-icon" href="/sales">
+            <span class="icon"><i class="mdi mdi-view-list"></i></span>
+            <span class="menu-item-label">Sales</span>
+          </a>
+        </li>
+        <li>
+          <a class="has-icon" href="/cx">
+            <span class="icon"><i class="mdi mdi-desktop-mac"></i></span>
+            <span class="menu-item-label">Customer Service</span>
+          </a>
+        </li>
+        <li>
+          <a class="has-icon" href="/peopleandculture">
+            <span class="icon"><i class="mdi mdi-view-list"></i></span>
+            <span class="menu-item-label">Peaple and Culture</span>
+          </a>
+        </li> 
+      </ul>
+      <p class="menu-label">About</p>
+      <ul class="menu-list">
+        <li>
+          <a href="/datarequest" rel="noopener noreferrer" target="_blank" class="has-icon">
+            <span class="icon"><i class="mdi mdi-credit-card-outline"></i></span>
+            <span class="menu-item-label">Dashboard Request</span>
+          </a>
+        </li>
+        <li>
+          <a href="/Help" rel="noopener noreferrer" class="has-icon">
+            <span class="icon"><i class="mdi mdi-help-circle"></i></span>
+            <span class="menu-item-label">About</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </aside>
+  <section class="section is-title-bar">
+    <div class="level">
+      <div class="level-left">
+        <div class="level-item">
+          <ul>
+            <li>Operations</li>
+            <li>...</li>
+          </ul>
+        </div>
+      </div>
+      <div class="level-right">
+        <div class="level-item">
+          <div class="buttons is-right">
+            <a href="" onclick="refreshIframe();" rel="noopener noreferrer" target="_blank" class="button is-primary">
+              <span class="icon"><i class="mdi mdi-reload"></i></span>
+              <span>Refresh</span>
+            </a>
+            <script>
+              function refreshIframe() {
+              var ifr = document.getElementsByName('Right')[0];
+              ifr.src = ifr.src;
+              }
+            </script>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section is-main-section">
+    <div class="card">
+      <div class="card-content">
+        <div class="chart-area">
+          <div style="height: 100%;">
+            <div class="chartjs-size-monitor">
+              <div class="chartjs-size-monitor-expand">
+                <div></div>
+              </div>
+              <div class="chartjs-size-monitor-shrink">
+                <div></div>
+              </div>
+            </div>
+            
+            <form method="get">
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Driver Scorecard</label>                
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded has-icons-left">
+                      <a href="/driverscorecard"><button type='button' class="label">Driver Scorecard</button></a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Marshal Dashboard</label>  
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded has-icons-left">
+                      <a href="/marshaldashboard"><button type='button' class="label">Marshal Dashboard</button></a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Seat Occupancy</label>  
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded has-icons-left">
+                      <a href="/seatoccupancy"><button type='button' class="label">Seat Occupancy</button></a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Feedback Tracker</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded has-icons-left">
+                      <a href="/feedbacktracker"><button type='button' class="label">Feedback Tracker</button></a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <hr>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Shuttlers QA</label>
+                </div>
+                <div class="field-body">
+                  <div class="field">
+                    <p class="control is-expanded has-icons-left">
+                      <a href="/shuttlersqa"><button type='button' class="label">Shuttlers QA</button></a>
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer class="footer">
+    <div class="container-fluid">
+      <div class="level">
+        <div class="level-left">
+          <div class="level-item">
+            © 2023, Shuttlers Mobility
+          </div>
+          <div class="level-item">
+            <a class="icon" href="https://admin.shuttlers.ng" style="margin-left:150%; min-width:100%">
+              <img title="Admin Dashboard"  src=".\img\shuttlers-logo.png" style="min-width:300%;">
+            </a>
+          </div>
+        </div>
+        <div class="level-right">
+          <div class="level-item">
+            <div class="logo">
+              <a href="https://admin.shuttlers.ng"><img src="./img/logo.png" alt="admin.shuttlers.ng"></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<div id="sample-modal" class="modal">
+  <div class="modal-background jb-modal-close"></div>
+  <div class="modal-card">
+    <header class="modal-card-head">
+      <p class="modal-card-title">Confirm action</p>
+      <button class="delete jb-modal-close" aria-label="close"></button>
+    </header>
+    <section class="modal-card-body">
+      <p>This will permanently delete <b>Some Object</b></p>
+      <p>This is sample modal</p>
+    </section>
+    <footer class="modal-card-foot">
+      <button class="button jb-modal-close">Cancel</button>
+      <button class="button is-danger jb-modal-close">Delete</button>
+    </footer>
+  </div>
+  <button class="modal-close is-large jb-modal-close" aria-label="close"></button>
+</div>
+
+<!-- Scripts below are for demo only -->
+<script type="text/javascript" src="js/main.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+<script type="text/javascript" src="js/chart.sample.min.js"></script>
+
+<!-- Icons -->
+<link rel="stylesheet" href="https://cdn.materialdesignicons.com/4.9.95/css/materialdesignicons.min.css">
+</body>
+</html>

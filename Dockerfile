@@ -47,6 +47,7 @@ RUN chown -R docker:docker /intel && \
 
 USER docker:docker
 
+
 EXPOSE 9193
 
 #RUN ["chmod", "+x", "./intel"]

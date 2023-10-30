@@ -2,7 +2,7 @@ CREATE DATABASE itsm;
 USE itsm;
 
 CREATE TABLE staff (
-	id      INT AUTO_INCREMENT PRIMARY KEY,
+	id INT AUTO_INCREMENT PRIMARY KEY,
 	first_name    VARCHAR(100) NOT NULL,
 	last_name     VARCHAR(100) NOT NULL,
 	staff_email   VARCHAR(100) NOT NULL,
@@ -14,14 +14,14 @@ CREATE TABLE staff (
 );
 
 CREATE TABLE agents (
-	id
+	id INT AUTO_INCREMENT PRIMARY KEY,
 	first_name  VARCHAR(100) NOT NULL,
 	last_name   VARCHAR(100) NOT NULL,
 	agent_email VARCHAR(100) NOT NULL,
 	username    VARCHAR(50) NOT NULL,
 	role_id     INT,
 	unit_id     INT,
-	superisor_id INT,
+	supervisor_id INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(id),
@@ -56,7 +56,7 @@ CREATE TABLE tickets (
     FOREIGN KEY (related_ticket_id) REFERENCES tickets(id),
     FOREIGN KEY (sla_id) REFERENCES sla(id),
     FOREIGN KEY (priority_id) REFERENCES priority(id),
-    FOREIGN KEY (attachment_id) REFERENCES attachment(id)
+    FOREIGN KEY (attachment_id) REFERENCES attachments(id)
 );
 
 CREATE TABLE assets (
@@ -79,7 +79,7 @@ CREATE TABLE assets (
 CREATE TABLE sla (
 	id          INT AUTO_INCREMENT PRIMARY KEY,
 	sla_name        VARCHAR(100) NOT NULL,
-	policyriority_id     INT,
+	priority_id     INT,
 	satisfaction_id INT,
 	policy_id      INT,
     FOREIGN KEY (priority_id) REFERENCES priority(id),
@@ -124,32 +124,50 @@ CREATE TABLE positions (
 );
 
 CREATE TABLE departments (
-	department_id   INT AUTO_INCREMENT PRIMARY KEY,
+	id   INT AUTO_INCREMENT PRIMARY KEY,
 	department_name VARCHAR(100) NOT NULL,
 	emoji   VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
+CREATE TABLE units (
+	id   INT AUTO_INCREMENT PRIMARY KEY,
+	unit_name VARCHAR(100) NOT NULL,
+	emoji   VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
 CREATE TABLE roles (
-	role_id   INT AUTO_INCREMENT PRIMARY KEY,
+	id   INT AUTO_INCREMENT PRIMARY KEY,
 	role_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE category (
-	category_id   INT AUTO_INCREMENT PRIMARY KEY,
+	id   INT AUTO_INCREMENT PRIMARY KEY,
 	category_name VARCHAR(100) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 CREATE TABLE sub_category (
-	sub_category_id   INT AUTO_INCREMENT PRIMARY KEY,
+	id   INT AUTO_INCREMENT PRIMARY KEY,
 	sub_categoryName VARCHAR(100) NOT NULL,
 	category_id  INT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES category(id)
 );
+
+CREATE TABLE attachments (
+	id   INT AUTO_INCREMENT PRIMARY KEY,
+	short_link VARCHAR(255) NOT NULL,
+	long_link TEXT,
+	image BLOB,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+

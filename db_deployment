@@ -1,0 +1,155 @@
+CREATE DATABASE itsm;
+USE itsm;
+
+CREATE TABLE staff (
+	id      INT AUTO_INCREMENT PRIMARY KEY,
+	first_name    VARCHAR(100) NOT NULL,
+	last_name     VARCHAR(100) NOT NULL,
+	staff_email   VARCHAR(100) NOT NULL,
+	username     VARCHAR(50) NOT NULL,
+	position_iD   INT,
+	department_iD INT,
+    FOREIGN KEY (position_id) REFERENCES positions(id),
+    FOREIGN KEY (department_id) REFERENCES departments(id)
+);
+
+CREATE TABLE agents (
+	id
+	first_name  VARCHAR(100) NOT NULL,
+	last_name   VARCHAR(100) NOT NULL,
+	agent_email VARCHAR(100) NOT NULL,
+	username    VARCHAR(50) NOT NULL,
+	role_id     INT,
+	unit_id     INT,
+	superisor_id INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    FOREIGN KEY (unit_id) REFERENCES units(id),
+    FOREIGN KEY (supervisor_id) REFERENCES staff(id)
+);
+
+CREATE TABLE tickets (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	subject VARCHAR(255) NOT NULL,
+	description TEXT,
+	category_id INT,
+	sub_category_id INT,
+	priority_id INT,
+	sla_id INT,
+	staff_id INT,
+	agent_id INT,
+	created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	due_at  DATE,
+	asset_id INT,
+	related_ticket_id INT,
+	tag   VARCHAR(50) NOT NULL,
+	site  VARCHAR(50) NOT NULL,
+	attachment_id  INT,
+    status ENUM('open', 'in_progress', 'closed'),
+    FOREIGN KEY (category_id) REFERENCES category(id),
+    FOREIGN KEY (sub_category_id) REFERENCES sub_category(id),
+    FOREIGN KEY (staff_id) REFERENCES staff(id),
+    FOREIGN KEY (agent_id) REFERENCES agents(id),
+    FOREIGN KEY (asset_id) REFERENCES assets(id),
+    FOREIGN KEY (related_ticket_id) REFERENCES tickets(id),
+    FOREIGN KEY (sla_id) REFERENCES sla(id),
+    FOREIGN KEY (priority_id) REFERENCES priority(id),
+    FOREIGN KEY (attachment_id) REFERENCES attachment(id)
+);
+
+CREATE TABLE assets (
+	id            INT AUTO_INCREMENT PRIMARY KEY,
+    asset_id      VARCHAR(100) NOT NULL,
+	asset_type    VARCHAR(50) NOT NULL, 
+	asset_name    VARCHAR(100) NOT NULL, 
+	description   TEXT,
+	manufacturer  VARCHAR(100) NOT NULL,
+	model         VARCHAR(100) NOT NULL,
+	serial_number VARCHAR(100) NOT NULL,
+	purchase_date DATE,
+	purchase_price INT,
+	site VARCHAR(100) NOT NULL,
+	status VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sla (
+	id          INT AUTO_INCREMENT PRIMARY KEY,
+	sla_name        VARCHAR(100) NOT NULL,
+	policyriority_id     INT,
+	satisfaction_id INT,
+	policy_id      INT,
+    FOREIGN KEY (priority_id) REFERENCES priority(id),
+    FOREIGN KEY (satisfaction_id) REFERENCES satisfaction(id),
+    FOREIGN KEY (policy_id) REFERENCES policy(id),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE priority (
+	id    INT AUTO_INCREMENT PRIMARY KEY,
+	priority_name  VARCHAR(100) NOT NULL,
+	first_response INT,
+	colour   VARCHAR(50) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE satisfaction (
+	id INT AUTO_INCREMENT PRIMARY KEY,
+	satisfaction_name VARCHAR(100) NOT NULL,
+	emoji VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE policy (
+	id     INT AUTO_INCREMENT PRIMARY KEY,
+	policy_name   VARCHAR(100) NOT NULL,
+	embedded_link VARCHAR(255) NOT NULL,
+	policy_url  VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE positions (
+	id   INT AUTO_INCREMENT PRIMARY KEY,
+	position_name VARCHAR(150) NOT NULL,
+	cadre_name    VARCHAR(150) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE departments (
+	department_id   INT AUTO_INCREMENT PRIMARY KEY,
+	department_name VARCHAR(100) NOT NULL,
+	emoji   VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE roles (
+	role_id   INT AUTO_INCREMENT PRIMARY KEY,
+	role_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE category (
+	category_id   INT AUTO_INCREMENT PRIMARY KEY,
+	category_name VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);
+
+CREATE TABLE sub_category (
+	sub_category_id   INT AUTO_INCREMENT PRIMARY KEY,
+	sub_categoryName VARCHAR(100) NOT NULL,
+	category_id  INT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (category_id) REFERENCES category(id)
+);

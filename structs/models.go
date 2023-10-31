@@ -22,7 +22,7 @@ type ITSMAgent struct {
 }
 
 type Ticket struct {
-	TicketID        int    `json:"ticket_id"`
+	ID              int    `json:"ticket_id"`
 	Subject         string `json:"subject"`
 	Description     string `json:"description"`
 	Category        int    `json:"category"`

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -8,6 +9,7 @@ import (
 	//"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/handlers"
 	"github.com/shuttlersIT/intel/middleware"
@@ -15,8 +17,10 @@ import (
 
 func main() {
 	//initiate mysql database
-	status := database.ConnectMysql()
+	status, db := database.ConnectMysql()
 	fmt.Println(status)
+
+	database.TableExists(db, "tickets")
 
 	//RedisHost := "127.0.0.1"
 	//RedisPort := "6379"
@@ -77,6 +81,11 @@ func main() {
 		authorized.GET("/itsm/ticketing/0/admin", handlers.ItDeskAdminHandler)
 		authorized.GET("/itsm/ticketing", handlers.ItDeskHandler)
 		authorized.GET("/testing", homeTest)
+		authorized.GET("/ticketing/0/admin/work", handlers.ListTickets)
+		authorized.POST("/ticketing/0/admin/work", handlers.CreateTicket)
+		authorized.PUT("/ticketing/0/admin/work/:id", handlers.UpdateTicket)
+		authorized.DELETE("/ticketing/0/admin/work/:id", handlers.DeleteTicket)
+
 	}
 
 	//Assets Portal Router Group
@@ -119,4 +128,11 @@ func homeTest(c *gin.Context) {
 	s.Save()
 
 	c.JSON(200, gin.H{"count": count})
+}
+
+func ShareDb(d *sql.DB) *sql.DB {
+	db := d
+
+	database.TableExists(db, "tickets")
+	return d
 }

@@ -1,4 +1,3 @@
-
 package main
 
 import (
@@ -55,7 +54,9 @@ func main() {
 	router.GET("/login", handlers.LoginHandler)
 	router.GET("/auth", handlers.AuthHandler)
 	router.GET("/logout", handlers.LogoutHandler)
+	router.GET("/itsm", handlers.ItsmHandler)
 
+	//Intel-Dashboard Portal Router Group
 	authorized := router.Group("/")
 	authorized.Use(middleware.AuthorizeRequest())
 	{
@@ -76,7 +77,27 @@ func main() {
 	}
 	//router.Use(static.Serve("/", static.LocalFile("./templates", true)))
 
-	if err := router.Run(":9193"); err != nil {
+	//Intel-Dashboard Portal Router Group
+	itsm := router.Group("/itsm")
+	itsm.Use(middleware.AuthorizeRequest())
+	{
+		authorized.GET("/itsm/portal", handlers.PortalHandler)
+		authorized.GET("/itsm/cx", handlers.CxHandler)
+		authorized.GET("/itsm/sales", handlers.SalesHandler)
+		authorized.GET("/itsm/home", handlers.PerformanceHandler)
+		authorized.GET("/itsm/marketing", handlers.MarketingHandler)
+		authorized.GET("/itsm/operations", handlers.OperationsHandler)
+		authorized.GET("/itsm/driverscorecard", handlers.DriverHandler)
+		authorized.GET("/itsm/feedbacktracker", handlers.FeedbackHandler)
+		authorized.GET("/itsm/marshaldashboard", handlers.MarshalHandler)
+		authorized.GET("/itsm/peopleandculture", handlers.PeopleHandler)
+		authorized.GET("/itsm/seatoccupancy", handlers.SeatHandler)
+		authorized.GET("/itsm/shuttlersqa", handlers.QaHandler)
+		authorized.GET("/itsm/itsm/datarequest", handlers.RequestHandler)
+		authorized.GET("/itsm/testing", homeTest)
+	}
+
+	if err := router.Run(":5152"); err != nil {
 		log.Fatal(err)
 	}
 

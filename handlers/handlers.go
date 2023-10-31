@@ -4,10 +4,10 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
-	"fmt"
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
@@ -111,7 +111,7 @@ func AuthHandler(c *gin.Context) {
 	session.Set("user-id", u.Email)
 	session.Set("user-name", u.Name)
 	err = session.Save()
-	
+
 	if err != nil {
 		log.Println(err)
 		c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Error while saving session. Please try again."})
@@ -291,4 +291,11 @@ func OperationsHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	userID := session.Get("user-id")
 	c.HTML(http.StatusOK, "operations.html", gin.H{"Username": userID})
+}
+
+// ITSM Home
+func ItsmHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userID})
 }

@@ -60,7 +60,7 @@ func main() {
 	router.GET("/auth", handlers.AuthHandler)
 	router.GET("/logout", handlers.LogoutHandler)
 
-	//Intel-Dashboard Portal Router Group
+	//Index ROute Router Group
 	authorized := router.Group("/")
 	authorized.Use(middleware.AuthorizeRequest())
 	{
@@ -69,7 +69,7 @@ func main() {
 	}
 	//router.Use(static.Serve("/", static.LocalFile("./templates", true)))
 
-	//Intel-Dashboard Portal Router Group
+	//ITSM Portal Router Group
 	itsm := router.Group("/itsm/ticketing")
 	itsm.Use(middleware.AuthorizeRequest())
 	{

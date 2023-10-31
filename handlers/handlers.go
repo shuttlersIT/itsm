@@ -136,7 +136,7 @@ func AuthHandler(c *gin.Context) {
 	fmt.Println(userID)
 	fmt.Println(session)
 	//uName := session.Get("user-name")
-	c.HTML(http.StatusOK, "home.html", gin.H{"Username": userID})
+	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userID})
 	//c.HTML(http.StatusOK, "home.html", gin.H{"name": uNam, "Username": userID, "seen": seen})
 
 	/*
@@ -198,50 +198,8 @@ func LogoutHandler(c *gin.Context) {
 	session.Clear()
 	session.Save()
 	c.JSON(http.StatusOK, gin.H{
-		"message": "User Sign out successfully",
+		"message": "User Signed out successfully",
 	})
-}
-
-// CxHandler is a rudementary handler for logged in users.
-func PortalHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "portal.html", gin.H{"Username": userID})
-}
-
-// CxHandler is a rudementary handler for logged in users.
-func CxHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "cx.html", gin.H{"Username": userID})
-}
-
-// SalesHandler is a rudementary handler for logged in users.
-func SalesHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "sales.html", gin.H{"Username": userID})
-}
-
-// MarketingHandler is a rudementary handler for logged in users.
-func MarketingHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "marketing.html", gin.H{"Username": userID})
-}
-
-// PeopleHandler is a rudementary handler for logged in users.
-func PeopleHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "peopleandculture.html", gin.H{"Username": userID})
-}
-
-// PerformanceHandler is a rudementary handler for logged in users.
-func PerformanceHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "home.html", gin.H{"Username": userID})
 }
 
 // RequestHandler is a rudementary handler for logged in users.
@@ -251,51 +209,62 @@ func RequestHandler(c *gin.Context) {
 	c.HTML(http.StatusOK, "datarequest.html", gin.H{"Username": userID})
 }
 
-// DriverHandler is a rudementary handler for logged in users.
-func DriverHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "driverscorecard.html", gin.H{"Username": userID})
-}
-
-// MarshalHandler is a rudementary handler for logged in users.
-func MarshalHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "marshaldashboard.html", gin.H{"Username": userID})
-}
-
-// SeatHandler is a rudementary handler for logged in users.
-func SeatHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "seatoccupancy.html", gin.H{"Username": userID})
-}
-
-// QaHandler is a rudementary handler for logged in users.
-func QaHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "shuttlersqa.html", gin.H{"Username": userID})
-}
-
-// FeedbackHandler is a rudementary handler for logged in users.
-func FeedbackHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "feedbacktracker.html", gin.H{"Username": userID})
-}
-
-// OperationsHandler is a rudementary handler for logged in users.
-func OperationsHandler(c *gin.Context) {
-	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "operations.html", gin.H{"Username": userID})
-}
-
 // ITSM Home
 func ItsmHandler(c *gin.Context) {
 	session := sessions.Default(c)
 	userID := session.Get("user-id")
 	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userID})
+}
+
+// ITSM Desk
+func ItDeskPortalHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userID})
+}
+func ItDeskAdminHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "itdeskadmin.html", gin.H{"Username": userID})
+}
+func ItDeskHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userID})
+}
+
+// Assets
+func AssetsPortalHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "assetsportal.html", gin.H{"Username": userID})
+}
+
+func AssetsAdminHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "assetsadmin.html", gin.H{"Username": userID})
+}
+func AssetsHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "assetsx.html", gin.H{"Username": userID})
+}
+
+// Procurement
+func ProcurementPortalHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "procurementportal.html", gin.H{"Username": userID})
+}
+
+func ProcurementAdminHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "procurementadmin.html", gin.H{"Username": userID})
+}
+func ProcurementHandler(c *gin.Context) {
+	session := sessions.Default(c)
+	userID := session.Get("user-id")
+	c.HTML(http.StatusOK, "procurementx.html", gin.H{"Username": userID})
 }

@@ -8,11 +8,16 @@ import (
 	//"github.com/gin-contrib/sessions/redis"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/handlers"
 	"github.com/shuttlersIT/intel/middleware"
 )
 
 func main() {
+	//initiate mysql database
+	status := database.ConnectMysql()
+	fmt.Println(status)
+
 	//RedisHost := "127.0.0.1"
 	//RedisPort := "6379"
 
@@ -54,47 +59,44 @@ func main() {
 	router.GET("/login", handlers.LoginHandler)
 	router.GET("/auth", handlers.AuthHandler)
 	router.GET("/logout", handlers.LogoutHandler)
-	router.GET("/itsm", handlers.ItsmHandler)
 
 	//Intel-Dashboard Portal Router Group
 	authorized := router.Group("/")
 	authorized.Use(middleware.AuthorizeRequest())
 	{
-		authorized.GET("/portal", handlers.PortalHandler)
-		authorized.GET("/cx", handlers.CxHandler)
-		authorized.GET("/sales", handlers.SalesHandler)
-		authorized.GET("/home", handlers.PerformanceHandler)
-		authorized.GET("/marketing", handlers.MarketingHandler)
-		authorized.GET("/operations", handlers.OperationsHandler)
-		authorized.GET("/driverscorecard", handlers.DriverHandler)
-		authorized.GET("/feedbacktracker", handlers.FeedbackHandler)
-		authorized.GET("/marshaldashboard", handlers.MarshalHandler)
-		authorized.GET("/peopleandculture", handlers.PeopleHandler)
-		authorized.GET("/seatoccupancy", handlers.SeatHandler)
-		authorized.GET("/shuttlersqa", handlers.QaHandler)
-		authorized.GET("/datarequest", handlers.RequestHandler)
+		authorized.GET("/itsm", handlers.ItsmHandler)
 		authorized.GET("/testing", homeTest)
 	}
 	//router.Use(static.Serve("/", static.LocalFile("./templates", true)))
 
 	//Intel-Dashboard Portal Router Group
-	itsm := router.Group("/itsm")
+	itsm := router.Group("/itsm/ticketing")
 	itsm.Use(middleware.AuthorizeRequest())
 	{
-		authorized.GET("/itsm/portal", handlers.PortalHandler)
-		authorized.GET("/itsm/cx", handlers.CxHandler)
-		authorized.GET("/itsm/sales", handlers.SalesHandler)
-		authorized.GET("/itsm/home", handlers.PerformanceHandler)
-		authorized.GET("/itsm/marketing", handlers.MarketingHandler)
-		authorized.GET("/itsm/operations", handlers.OperationsHandler)
-		authorized.GET("/itsm/driverscorecard", handlers.DriverHandler)
-		authorized.GET("/itsm/feedbacktracker", handlers.FeedbackHandler)
-		authorized.GET("/itsm/marshaldashboard", handlers.MarshalHandler)
-		authorized.GET("/itsm/peopleandculture", handlers.PeopleHandler)
-		authorized.GET("/itsm/seatoccupancy", handlers.SeatHandler)
-		authorized.GET("/itsm/shuttlersqa", handlers.QaHandler)
-		authorized.GET("/itsm/itsm/datarequest", handlers.RequestHandler)
-		authorized.GET("/itsm/testing", homeTest)
+		authorized.GET("/itsm/ticketing/itportal", handlers.ItDeskPortalHandler)
+		authorized.GET("/itsm/ticketing/0/admin", handlers.ItDeskAdminHandler)
+		authorized.GET("/itsm/ticketing", handlers.ItDeskHandler)
+		authorized.GET("/testing", homeTest)
+	}
+
+	//Assets Portal Router Group
+	assets := router.Group("/itsm/assets")
+	assets.Use(middleware.AuthorizeRequest())
+	{
+		authorized.GET("/itsm/assets/portal", handlers.AssetsPortalHandler)
+		authorized.GET("/itsm/assets/1/admin", handlers.AssetsAdminHandler)
+		authorized.GET("/itsm/assets", handlers.AssetsHandler)
+		authorized.GET("/testing", homeTest)
+	}
+
+	//Procurement Dashboard Portal Router Group
+	procurement := router.Group("/itsm/procurement")
+	procurement.Use(middleware.AuthorizeRequest())
+	{
+		authorized.GET("/itsm/procurement/portal", handlers.ProcurementPortalHandler)
+		authorized.GET("/itsm/procurement/2/admin", handlers.ProcurementAdminHandler)
+		authorized.GET("/itsm/procurement", handlers.ProcurementHandler)
+		authorized.GET("/testing", homeTest)
 	}
 
 	if err := router.Run(":5152"); err != nil {

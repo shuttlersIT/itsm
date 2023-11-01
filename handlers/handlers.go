@@ -19,6 +19,7 @@ import (
 	"golang.org/x/oauth2/google"
 )
 
+type ticket structs.Ticket
 var c string
 var conf *oauth2.Config
 
@@ -36,6 +37,21 @@ func ShareDb(d *sql.DB) *sql.DB {
 	db := d
 	database.TableExists(db, "tickets")
 	return d
+}
+
+func getID(e string) int, string{
+	var id int
+	email := e
+	err := db.QueryRow("SELECT id FROM staff WHERE email = ?", email).
+		Scan(&id)
+	if err != nil {
+		session := sessions.Default(c)
+		email := session.Get("user-email")
+		t := handler.CreateUser()
+		c.JSON(http.StatusNotFound, gin.H{"error": "Staff email not found in our records"})
+		return
+	}
+	return id, email
 }
 
 func getLoginURL(state string) string {
@@ -56,24 +72,6 @@ func init() {
 		Endpoint: google.Endpoint,
 	}
 }
-
-/* IndexHandler handles the location /.
-func IndexHandler(c *gin.Context) {
-	state, err := RandToken(32)
-	if err != nil {
-			c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while generating random data."})
-			return
-	}
-	session := sessions.Default(c)
-	session.Set("state", state)
-	err = session.Save()
-	if err != nil {
-			c.HTML(http.StatusInternalServerError, "index.html", gin.H{"message": "Error while saving session."})
-			return
-	}
-	link := getLoginURL(state)
-	c.HTML(http.StatusOK, "login.html", gin.H{"link": link})
-}*/
 
 // IndexHandler handles the login
 func IndexHandler(c *gin.Context) {
@@ -119,8 +117,21 @@ func AuthHandler(c *gin.Context) {
 	}
 
 	// Get user ID
-	session.Set("user-id", u.Email)
+	session.Set("user-email", u.Email)
 	session.Set("user-name", u.Name)
+	session.Set("user-firstName", u.GivenName)
+	session.Set("user-lastName", u.FamilyName)
+	session.Set("user-sub", u.Sub)
+	err = session.Save()
+
+	//
+	userId := getID(u.Email)
+	session.Set("id", userId)
+	session.Set("user-email", u.Email)
+	session.Set("user-name", u.Name)
+	session.Set("user-firstName", u.GivenName)
+	session.Set("user-lastName", u.FamilyName)
+	session.Set("user-sub", u.Sub)
 	err = session.Save()
 
 	if err != nil {
@@ -130,59 +141,17 @@ func AuthHandler(c *gin.Context) {
 	}
 	//seen := false
 
-	/*
-		db := database.MongoDBConnection{}
-		if _, mongoErr := db.LoadUser(u.Email); mongoErr == nil {
-			seen = true
-		} else {
-			err = db.SaveUser(&u)
-			if err != nil {
-				log.Println(err)
-				c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Something went wrong... it's not you, its us. Please try again."})
-				return
-			}
-		}
-	*/
-	userID := session.Get("user-id")
-	fmt.Println(userID)
+	userEmail := session.Get("user-Email")
+	fmt.Println(userEmail)
 	fmt.Println(session)
 	//uName := session.Get("user-name")
-	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userID})
+
+	//COMPARE GOOGLE CREDENTIALS TO DB
+	itsmUser := handlers.GetStaff()
+
+	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userEmail})
 	//c.HTML(http.StatusOK, "home.html", gin.H{"name": uNam, "Username": userID, "seen": seen})
 
-	/*
-		usersEmail, err := emailaddress.Parse(u.Email)
-		if err != nil {
-				c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like your email address is invalid, try again."})
-		}
-
-		if strings.Compare(usersEmail.Domain, shuttlersDomain) == 0 {
-				session.Set("user-id", u.Email)
-				session.Set("user-name", u.Name)
-				err = session.Save()
-				if err != nil {
-						log.Println(err)
-						c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Error while saving session. Please try again."})
-						return
-				}
-				seen := false
-				db := database.MongoDBConnection{}
-				if _, mongoErr := db.LoadUser(u.Email); mongoErr == nil {
-						seen = true
-				} else {
-						err = db.SaveUser(&u)
-						if err != nil {
-								log.Println(err)
-								c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Something went wrong... it's not you, its us. Please try again."})
-								return
-						}
-				}
-				c.HTML(http.StatusOK, "portal.html", gin.H{"email": u.Email, "Username": u.Name, "seen": seen})
-		} else {
-				c.HTML(http.StatusBadRequest, "error.html", gin.H{"message": "Looks like do not have a shuttlers email address, Please signin with your shuttlers email account."})
-
-		}
-	*/
 }
 
 // LoginHandler handles the login procedure.
@@ -216,66 +185,66 @@ func LogoutHandler(c *gin.Context) {
 // RequestHandler is a rudementary handler for logged in users.
 func RequestHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "datarequest.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "datarequest.html", gin.H{"Username": userEmail})
 }
 
 // ITSM Home
 func ItsmHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userEmail})
 }
 
 // ITSM Desk
 func ItDeskPortalHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userEmail})
 }
 func ItDeskAdminHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "itdeskadmin.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "itdeskadmin.html", gin.H{"Username": userEmail})
 }
 func ItDeskHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "itdesk.html", gin.H{"Username": userEmail})
 }
 
 // Assets
 func AssetsPortalHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "assetsportal.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "assetsportal.html", gin.H{"Username": userEmail})
 }
 
 func AssetsAdminHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "assetsadmin.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "assetsadmin.html", gin.H{"Username": userEmail})
 }
 func AssetsHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "assetsx.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "assetsx.html", gin.H{"Username": userEmail})
 }
 
 // Procurement
 func ProcurementPortalHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "procurementportal.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "procurementportal.html", gin.H{"Username": userEmail})
 }
 
 func ProcurementAdminHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "procurementadmin.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "procurementadmin.html", gin.H{"Username": userEmail})
 }
 func ProcurementHandler(c *gin.Context) {
 	session := sessions.Default(c)
-	userID := session.Get("user-id")
-	c.HTML(http.StatusOK, "procurementx.html", gin.H{"Username": userID})
+	userEmail := session.Get("user-email")
+	c.HTML(http.StatusOK, "procurementx.html", gin.H{"Username": userEmail})
 }

@@ -13,6 +13,7 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/structs"
 	"golang.org/x/oauth2"
@@ -20,6 +21,7 @@ import (
 )
 
 type ticket structs.Ticket
+
 var c string
 var conf *oauth2.Config
 
@@ -33,23 +35,27 @@ func RandToken(l int) (string, error) {
 }
 
 // Share databases
-func ShareDb(d *sql.DB) *sql.DB {
+func ShareDb(d *sql.DB, c *gin.Context) *sql.DB {
 	db := d
 	database.TableExists(db, "tickets")
 	return d
 }
 
-func getID(e string) int, string{
+func getID(e string, c *gin.Context) (int, string) {
 	var id int
 	email := e
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return 0, ""
+	}
+
 	err := db.QueryRow("SELECT id FROM staff WHERE email = ?", email).
 		Scan(&id)
 	if err != nil {
-		session := sessions.Default(c)
-		email := session.Get("user-email")
-		t := handler.CreateUser()
+		id = CreateUser(c)
 		c.JSON(http.StatusNotFound, gin.H{"error": "Staff email not found in our records"})
-		return
+		return id, email
 	}
 	return id, email
 }
@@ -125,7 +131,7 @@ func AuthHandler(c *gin.Context) {
 	err = session.Save()
 
 	//
-	userId := getID(u.Email)
+	userId, _ := getID(u.Email, c)
 	session.Set("id", userId)
 	session.Set("user-email", u.Email)
 	session.Set("user-name", u.Name)
@@ -145,9 +151,6 @@ func AuthHandler(c *gin.Context) {
 	fmt.Println(userEmail)
 	fmt.Println(session)
 	//uName := session.Get("user-name")
-
-	//COMPARE GOOGLE CREDENTIALS TO DB
-	itsmUser := handlers.GetStaff()
 
 	c.HTML(http.StatusOK, "itsm.html", gin.H{"Username": userEmail})
 	//c.HTML(http.StatusOK, "home.html", gin.H{"name": uNam, "Username": userID, "seen": seen})

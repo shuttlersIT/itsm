@@ -1,6 +1,7 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 
@@ -9,14 +10,14 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jinzhu/gorm"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/handlers"
 	"github.com/shuttlersIT/intel/middleware"
 )
 
 // ApiMiddleware will add the db connection to the context
-func ApiMiddleware(db gorm.DB) gin.HandlerFunc {
+func ApiMiddleware(db *sql.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		c.Set("databaseConn", db)
 		c.Next()
@@ -24,19 +25,20 @@ func ApiMiddleware(db gorm.DB) gin.HandlerFunc {
 }
 
 func main() {
+	router := gin.Default()
 
 	//initiate mysql database
 	status, db := database.ConnectMysql()
 	fmt.Println(status)
 	database.TableExists(db, "tickets")
 
-	r.Use(ApiMiddleware(db))
+	router.Use(ApiMiddleware(db))
 
 	//RedisHost := "127.0.0.1"
 	//RedisPort := "6379"
 
 	//Dashboard APP
-	router := gin.Default()
+	//router := gin.Default()
 	token, err := handlers.RandToken(64)
 	if err != nil {
 		log.Fatal("unable to generate random token: ", err)

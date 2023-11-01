@@ -1,11 +1,12 @@
 package handlers
 
 import (
+	"database/sql"
 	"net/http"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/shuttlersIT/intel/structs"
 )
 
@@ -37,9 +38,13 @@ func DeleteTicket(c *gin.Context) {
 
 // List all tickets
 func ListTickets(c *gin.Context) {
-	session := sessions.Default(c)
-	id := session.Get("id")
-	db := d
+	// Don't forget type assertion when getting the connection from context.
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return
+	}
+
 	rows, err := db.Query("SELECT id, title, description, status FROM tickets")
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -62,9 +67,13 @@ func ListTickets(c *gin.Context) {
 
 // Create a new ticket
 func CreateTicket(c *gin.Context) {
-	session := sessions.Default(c)
-	id := session.Get("id")
-	db := d
+	// Don't forget type assertion when getting the connection from context.
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return
+	}
+
 	var t structs.Ticket
 	if err := c.ShouldBindJSON(&t); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -84,11 +93,16 @@ func CreateTicket(c *gin.Context) {
 
 // Get a ticket by ID
 func GetTicket(c *gin.Context) {
-	session := sessions.Default(c)
-	id := session.Get("id")
-	db := d
+	id := c.Param("id")
+
+	// Don't forget type assertion when getting the connection from context.
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return
+	}
 	var t structs.Ticket
-	err := db.QueryRow("SELECT id, title, description, status FROM tickets WHERE id = ?", id).
+	err := db.QueryRow("SELECT id, subject, description, status FROM tickets WHERE id = ?", id).
 		Scan(&t.ID, &t.Subject, &t.Description, &t.Status)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Ticket not found"})
@@ -98,10 +112,15 @@ func GetTicket(c *gin.Context) {
 }
 
 // Update a ticket by ID
-func updateTicket(c *gin.Context) {
-	session := sessions.Default(c)
-	id := session.Get("id")
-	db := d
+func UpdateTicket(c *gin.Context) {
+	id := c.Param("id")
+
+	// Don't forget type assertion when getting the connection from context.
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return
+	}
 	var t structs.Ticket
 	if err := c.ShouldBindJSON(&t); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -118,9 +137,14 @@ func updateTicket(c *gin.Context) {
 
 // Delete a ticket by ID
 func DeleteTicket(c *gin.Context) {
-	session := sessions.Default(c)
-	id := session.Get("id")
-	db := d
+	id := c.Param("id")
+
+	// Don't forget type assertion when getting the connection from context.
+	db, ok := c.MustGet("databaseConn").(*sql.DB)
+	if !ok {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Unable to reach DB from get user handler"})
+		return
+	}
 	_, err := db.Exec("DELETE FROM tickets WHERE id = ?", id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})

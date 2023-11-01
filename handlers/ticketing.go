@@ -1,15 +1,15 @@
 package handlers
 
 import (
-	"database/sql"
 	"net/http"
 
-	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/shuttlersIT/intel/structs"
 )
 
+//Ticket Handlers
+/*
 // Ticketing Handlers
 func ListTickets(c *gin.Context) {
 	session := sessions.Default(c)
@@ -32,9 +32,10 @@ func DeleteTicket(c *gin.Context) {
 	userID := session.Get("user-id")
 	c.HTML(http.StatusOK, "procurementx.html", gin.H{"Username": userID})
 }
+*/
 
 // List all tickets
-func listTickets(c *gin.Context, d *sql.DB) {
+func ListTickets(c *gin.Context) {
 	db := d
 	rows, err := db.Query("SELECT id, title, description, status FROM tickets")
 	if err != nil {
@@ -57,7 +58,7 @@ func listTickets(c *gin.Context, d *sql.DB) {
 }
 
 // Create a new ticket
-func createTicket(c *gin.Context, d *sql.DB) {
+func CreateTicket(c *gin.Context) {
 	db := d
 	var t structs.Ticket
 	if err := c.ShouldBindJSON(&t); err != nil {
@@ -77,7 +78,7 @@ func createTicket(c *gin.Context, d *sql.DB) {
 }
 
 // Get a ticket by ID
-func getTicket(c *gin.Context, d *sql.DB) {
+func GetTicket(c *gin.Context) {
 	db := d
 	id := c.Param("id")
 	var t structs.Ticket
@@ -91,7 +92,7 @@ func getTicket(c *gin.Context, d *sql.DB) {
 }
 
 // Update a ticket by ID
-func updateTicket(c *gin.Context, d *sql.DB) {
+func updateTicket(c *gin.Context) {
 	db := d
 	id := c.Param("id")
 	var t structs.Ticket
@@ -109,7 +110,7 @@ func updateTicket(c *gin.Context, d *sql.DB) {
 }
 
 // Delete a ticket by ID
-func deleteTicket(c *gin.Context, d *sql.DB) {
+func DeleteTicket(c *gin.Context) {
 	db := d
 	id := c.Param("id")
 	_, err := db.Exec("DELETE FROM tickets WHERE id = ?", id)

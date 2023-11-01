@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"crypto/rand"
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -11,6 +12,8 @@ import (
 
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
+	"github.com/shuttlersIT/intel/database"
 	"github.com/shuttlersIT/intel/structs"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -26,6 +29,13 @@ func RandToken(l int) (string, error) {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(b), nil
+}
+
+// Share databases
+func ShareDb(d *sql.DB) *sql.DB {
+	db := d
+	database.TableExists(db, "tickets")
+	return d
 }
 
 func getLoginURL(state string) string {
@@ -108,6 +118,7 @@ func AuthHandler(c *gin.Context) {
 		return
 	}
 
+	// Get user ID
 	session.Set("user-id", u.Email)
 	session.Set("user-name", u.Name)
 	err = session.Save()

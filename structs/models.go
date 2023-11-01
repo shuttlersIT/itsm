@@ -10,7 +10,7 @@ type Staff struct {
 	DepartmentID int    `json:"department_id"`
 }
 
-type ITSMAgent struct {
+type Agent struct {
 	AgentID      int    `json:"agent_id"`
 	FirstName    string `json:"first_name"`
 	LastName     string `json:"last_name"`
